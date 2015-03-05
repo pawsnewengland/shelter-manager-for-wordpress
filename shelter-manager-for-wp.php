@@ -4,7 +4,7 @@
  * Plugin Name: Shelter Manager for WordPress
  * Plugin URI: https://github.com/pawsnewengland/shelter-manager-for-wordpress
  * Description: Shelther Manager integration with WordPress.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Chris Ferdinandi
  * Author URI: http://gomakethings.com
  * License: MIT
@@ -26,6 +26,14 @@ function sm_get_pet_list($atts) {
 	$url = 'http://sheltermanager.com/asm/service?account=' . $shelter_id . '&method=xml_adoptable_animals&username=' . $username . '&password=' . $password;
 	$xml = @simplexml_load_file( $url );
 	$data = json_decode(json_encode($xml), true);
+
+	// Sort alphabetically
+	if ( !function_exists( 'asm_sort_by_name' ) ) {
+		function asm_sort_by_name($a, $b) {
+			return strcmp( $a['animalname'], $b['animalname'] );
+		}
+	}
+	usort($data[row], 'asm_sort_by_name');
 
 	// Create select elements
 	$options = '';
